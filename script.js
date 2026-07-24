@@ -15,7 +15,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 변수
     let stream = null;
-    let poseImages = ['동작/그림1.png', '동작/그림2.png', '동작/그림3.png', '동작/그림4.png', '동작/그림5.png'];
+    const poseImages = [
+        '동작/img1.jpg',
+        '동작/img2.jpg',
+        '동작/img3.jpg',
+        '동작/img4.jpg',
+        '동작/img5.jpg',
+        '동작/img6.jpg',
+        '동작/img7.jpg',
+        '동작/img8.jpg',
+        '동작/img9.jpg',
+        '동작/img10.jpg',
+        '동작/img11.jpg',
+        '동작/img12.jpg'
+    ];
     let currentPoseIndex = 0;
     
     // 오디오 컨텍스트 설정 (사용자 상호작용 후 초기화)
