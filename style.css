@@ -234,3 +234,26 @@ body {
 #next-btn:active {
     box-shadow: 0 0 0 #228b22;
 }
+
+/* 전체화면 버튼 */
+.fullscreen-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    background-color: #4682b4;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #315f86;
+    transition: all 0.2s ease;
+}
+
+.fullscreen-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #315f86;
+}

@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const snapshotCanvas = document.getElementById('snapshot-canvas');
     const countdownOverlay = document.getElementById('countdown-overlay');
     const countdownText = document.getElementById('countdown-text');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
 
     // 변수
     let stream = null;
@@ -116,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     captureBtn.addEventListener('click', () => {
         initAudio();
         captureBtn.disabled = true;
-        let count = 5; // 5초 카운트다운으로 변경됨
+        let count = 3; // 3초 카운트다운으로 변경됨
         countdownOverlay.style.display = 'flex';
         
         countdownText.innerText = count;
@@ -173,5 +174,25 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPoseIndex = (currentPoseIndex + 1) % poseImages.length;
         updatePoseImage();
         resetCaptureState();
+    });
+
+    // 전체화면 버튼 클릭
+    fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable fullscreen: ${err.message} (${err.name})`);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    });
+
+    // 전체화면 상태 변경 감지하여 버튼 텍스트 변경
+    document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement) {
+            fullscreenBtn.innerText = '🪟 창모드';
+        } else {
+            fullscreenBtn.innerText = '📺 전체화면';
+        }
     });
 });
