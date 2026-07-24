@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ready Action 동작 게임</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- 시작 화면 -->
+        <div id="start-screen" class="screen active">
+            <div class="main-title-container">
+                <h1 class="main-title">Ready Action!</h1>
+                <p class="sub-title">원하는 포즈로 신나게 따라해봐요!</p>
+            </div>
+            <img src="새_메인화면.jpg" alt="메인 화면" id="main-image">
+            <button id="start-btn" class="action-btn">게임 시작하기</button>
+        </div>
+
+        <!-- 게임 화면 -->
+        <div id="game-screen" class="screen">
+            <div class="split-layout">
+                <!-- 좌측: 동작 제시 이미지 -->
+                <div class="left-panel">
+                    <img id="pose-image" src="동작/그림1.png" alt="따라할 동작">
+                </div>
+                
+                <!-- 우측: 카메라 및 캡처 -->
+                <div class="right-panel">
+                    <video id="camera-feed" autoplay playsinline></video>
+                    <canvas id="snapshot-canvas"></canvas>
+                    <!-- 카운트다운 표시 오버레이 -->
+                    <div id="countdown-overlay">
+                        <span id="countdown-text"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 하단 컨트롤(교사용) -->
+            <div class="controls">
+                <button id="capture-btn" class="action-btn">📸 사진 촬영 (5초)</button>
+                <button id="next-btn" class="action-btn" style="display: none;">▶️ 다음 동작</button>
+                <button id="home-btn" class="action-btn secondary">🏠 처음으로</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
