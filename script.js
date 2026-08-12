@@ -180,23 +180,46 @@ document.addEventListener('DOMContentLoaded', () => {
         resetCaptureState();
     });
 
+    // 전체화면 호환성 함수
+    function getFullscreenElement() {
+        return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+    }
+
     // 전체화면 버튼 클릭
     fullscreenBtn.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.error(`Error attempting to enable fullscreen: ${err.message} (${err.name})`);
-            });
+        const docElm = document.documentElement;
+        if (!getFullscreenElement()) {
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen().catch(err => console.error(err));
+            } else if (docElm.webkitRequestFullscreen) { /* Safari / iOS (iPad) */
+                docElm.webkitRequestFullscreen();
+            } else if (docElm.msRequestFullscreen) { /* IE11 */
+                docElm.msRequestFullscreen();
+            } else {
+                alert("현재 기기나 브라우저에서는 전체화면 기능을 지원하지 않습니다. (예: 아이폰 사파리)");
+            }
         } else {
-            document.exitFullscreen();
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
         }
     });
 
     // 전체화면 상태 변경 감지하여 버튼 텍스트 변경
-    document.addEventListener('fullscreenchange', () => {
-        if (document.fullscreenElement) {
+    function handleFullscreenChange() {
+        if (getFullscreenElement()) {
             fullscreenBtn.innerText = '🪟 창모드';
         } else {
             fullscreenBtn.innerText = '📺 전체화면';
         }
-    });
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 });
