@@ -73,7 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
     async function startCamera() {
         try {
             stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { width: 1280, height: 720, facingMode: "user" },
+                video: { 
+                    width: { ideal: 1280 }, 
+                    height: { ideal: 720 }, 
+                    facingMode: "user" 
+                },
                 audio: false
             });
             cameraFeed.srcObject = stream;

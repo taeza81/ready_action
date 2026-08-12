@@ -44,7 +44,7 @@ body {
 
 /* 시작 화면 */
 #start-screen {
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     padding: 20px 0;
     background-color: #fff0f5; /* 연한 핑크 */
@@ -64,7 +64,6 @@ body {
 .main-title-container {
     z-index: 2;
     text-align: center;
-    margin-top: 220px;
     background: rgba(255, 255, 255, 0.9);
     padding: 20px 50px;
     border-radius: 40px;
@@ -256,4 +255,59 @@ body {
 .fullscreen-btn:active {
     transform: translateY(4px);
     box-shadow: 0 0 0 #315f86;
+}
+
+/* 반응형 디자인 (스마트폰/태블릿 가로모드 최적화) */
+@media screen and (max-height: 800px) {
+    .main-title {
+        font-size: 3rem;
+    }
+    .sub-title {
+        font-size: 1.2rem;
+    }
+    #start-btn {
+        font-size: 1.5rem;
+        padding: 15px 40px;
+    }
+    .controls {
+        height: 80px;
+    }
+    .split-layout {
+        height: calc(100% - 80px);
+    }
+    .action-btn {
+        padding: 10px 25px;
+        font-size: 1.2rem;
+    }
+}
+
+@media screen and (max-height: 500px) {
+    .main-title {
+        font-size: 2.2rem;
+    }
+    .sub-title {
+        font-size: 1rem;
+    }
+    .main-title-container {
+        padding: 10px 30px;
+    }
+    #start-btn {
+        font-size: 1.2rem;
+        padding: 10px 30px;
+        border-width: 2px;
+    }
+    .controls {
+        height: 60px;
+    }
+    .split-layout {
+        height: calc(100% - 60px);
+    }
+    .action-btn {
+        padding: 8px 15px;
+        font-size: 1rem;
+    }
+    .fullscreen-btn {
+        padding: 6px 12px;
+        font-size: 1rem;
+    }
 }
