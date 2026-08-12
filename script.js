@@ -190,13 +190,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const docElm = document.documentElement;
         if (!getFullscreenElement()) {
             if (docElm.requestFullscreen) {
-                docElm.requestFullscreen().catch(err => console.error(err));
+                docElm.requestFullscreen().catch(err => {
+                    console.error("전체화면 에러:", err);
+                    alert("이 브라우저(또는 기기)에서는 웹페이지 전체화면을 지원하지 않거나 차단되어 있습니다. (예: 아이폰 사파리 등)");
+                });
             } else if (docElm.webkitRequestFullscreen) { /* Safari / iOS (iPad) */
-                docElm.webkitRequestFullscreen();
+                try {
+                    docElm.webkitRequestFullscreen();
+                } catch(err) {
+                    alert("이 브라우저에서는 전체화면을 지원하지 않습니다.");
+                }
             } else if (docElm.msRequestFullscreen) { /* IE11 */
                 docElm.msRequestFullscreen();
             } else {
-                alert("현재 기기나 브라우저에서는 전체화면 기능을 지원하지 않습니다. (예: 아이폰 사파리)");
+                alert("현재 기기나 브라우저에서는 전체화면 기능을 지원하지 않습니다.");
             }
         } else {
             if (document.exitFullscreen) {
