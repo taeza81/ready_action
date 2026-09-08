@@ -60,15 +60,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 guideSteps.innerHTML = `
                     <div class="guide-step">
                         <span class="step-num">1</span>
-                        <span>위 <strong>'Safari 브라우저로 바로 열기'</strong> 버튼 터치</span>
+                        <span>카카오톡에서는 카메라/전체화면이 차단되므로 <strong>'Safari 브라우저로 바로 열기'</strong>를 터치합니다.</span>
                     </div>
                     <div class="guide-step">
                         <span class="step-num">2</span>
-                        <span>화면이 전환되지 않으면 카카오톡 오른쪽 아래 <strong>[ ··· ] 더보기</strong> 또는 <strong>[공유]</strong> 터치</span>
+                        <span>화면이 전환되지 않으면 카카오톡 우측 하단 <strong>[ ··· ] 더보기</strong> 또는 <strong>[공유 아이콘]</strong> 터치</span>
                     </div>
                     <div class="guide-step">
                         <span class="step-num">3</span>
-                        <span>메뉴 목록에서 <strong>'Safari로 열기'</strong>를 선택해주세요.</span>
+                        <span>메뉴 목록에서 <strong>'Safari로 열기'</strong>를 선택해주세요. (사파리 접속 후 [홈 화면에 추가] 시 100% 전체화면 앱 지원)</span>
                     </div>
                 `;
             }
@@ -492,55 +492,87 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 
-    // 전체화면 호환성 함수
-    function getFullscreenElement() {
-        return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+    // ==========================================================
+    // iOS 사파리 대응 및 전체화면 버튼 제어 (옵션 A)
+    // ==========================================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const isIOSTest = urlParams.get('test_ios') === '1' || urlParams.get('inapp') === 'ios';
+    const isIOSDevice = /iphone|ipad|ipod/i.test(navigator.userAgent) || isIOSTest;
+    const isStandaloneMode = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+    const iosPwaModal = document.getElementById('ios-pwa-modal');
+    const iosModalCloseX = document.getElementById('ios-modal-close-x');
+    const iosModalConfirmBtn = document.getElementById('ios-modal-confirm-btn');
+
+    function closeIosModal() {
+        if (iosPwaModal) iosPwaModal.style.display = 'none';
+    }
+    function openIosModal() {
+        if (iosPwaModal) iosPwaModal.style.display = 'flex';
     }
 
-    // 전체화면 버튼 클릭
-    fullscreenBtn.addEventListener('click', () => {
-        const docElm = document.documentElement;
-        const iosTip = "현재 브라우저/기기(아이폰/아이패드 사파리 등)는 웹페이지 전체화면 API를 지원하지 않습니다.\n\n💡 팁: 사파리 주소창 좌측의 '가/A' 버튼을 눌러 '도구 막대 가리기'를 선택하시거나, 브라우저 공유 메뉴에서 '홈 화면에 추가'하시면 전체화면 앱처럼 사용하실 수 있습니다!";
+    if (iosModalCloseX) iosModalCloseX.addEventListener('click', closeIosModal);
+    if (iosModalConfirmBtn) iosModalConfirmBtn.addEventListener('click', closeIosModal);
+    if (iosPwaModal) {
+        iosPwaModal.addEventListener('click', (e) => {
+            if (e.target === iosPwaModal) closeIosModal();
+        });
+    }
 
-        if (!getFullscreenElement()) {
-            if (docElm.requestFullscreen) {
-                docElm.requestFullscreen().catch(err => {
-                    console.error("전체화면 에러:", err);
-                    alert(iosTip);
-                });
-            } else if (docElm.webkitRequestFullscreen) { /* Safari / iOS (iPad) */
-                try {
+    if (isIOSDevice) {
+        if (isStandaloneMode) {
+            // 이미 '홈 화면에 추가'되어 100% 전체화면 앱으로 실행 중인 경우
+            fullscreenBtn.style.display = 'none';
+        } else {
+            // iOS 사파리 브라우저: 실행 불가능한 '전체화면' 대신 '홈화면 추가(전체화면)' 안내 버튼으로 변환
+            fullscreenBtn.innerText = '📲 홈화면 추가 (전체화면)';
+            fullscreenBtn.classList.add('ios-pwa-btn');
+            fullscreenBtn.title = '아이폰 전체화면 앱으로 실행하는 방법';
+
+            fullscreenBtn.addEventListener('click', () => {
+                openIosModal();
+            });
+        }
+    } else {
+        // Android, Windows, Mac 등 일반 브라우저: 표준 HTML5 Fullscreen API 동작
+        function getFullscreenElement() {
+            return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+        }
+
+        fullscreenBtn.addEventListener('click', () => {
+            const docElm = document.documentElement;
+            if (!getFullscreenElement()) {
+                if (docElm.requestFullscreen) {
+                    docElm.requestFullscreen().catch(err => {
+                        console.error("전체화면 에러:", err);
+                    });
+                } else if (docElm.webkitRequestFullscreen) {
                     docElm.webkitRequestFullscreen();
-                } catch(err) {
-                    alert(iosTip);
+                } else if (docElm.msRequestFullscreen) {
+                    docElm.msRequestFullscreen();
                 }
-            } else if (docElm.msRequestFullscreen) { /* IE11 */
-                docElm.msRequestFullscreen();
             } else {
-                alert(iosTip);
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
             }
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
-        }
-    });
+        });
 
-    // 전체화면 상태 변경 감지하여 버튼 텍스트 변경
-    function handleFullscreenChange() {
-        if (getFullscreenElement()) {
-            fullscreenBtn.innerText = '🪟 창모드';
-        } else {
-            fullscreenBtn.innerText = '📺 전체화면';
+        function handleFullscreenChange() {
+            if (getFullscreenElement()) {
+                fullscreenBtn.innerText = '🪟 창모드';
+            } else {
+                fullscreenBtn.innerText = '📺 전체화면';
+            }
         }
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     }
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 });

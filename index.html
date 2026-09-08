@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- iOS 사파리 홈 화면 추가(PWA 전체화면) 지원 메타 태그 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ready Action">
+    <link rel="apple-touch-icon" href="새_메인화면.jpg">
     <title>Ready Action 동작 게임</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -127,6 +132,41 @@
                 <button id="next-btn" class="action-btn" style="display: none;">▶️ 다음 동작</button>
                 <button id="home-btn" class="action-btn secondary">🏠 처음으로</button>
             </div>
+        </div>
+    </div>
+
+    <!-- iOS 사파리 홈 화면 추가(전체화면) 안내 모달 (옵션 A) -->
+    <div id="ios-pwa-modal" class="ios-modal-overlay" style="display: none;">
+        <div class="ios-modal-card">
+            <div class="ios-modal-header">
+                <span class="ios-modal-badge">🍎 아이폰 전체화면 앱 실행 안내</span>
+                <button id="ios-modal-close-x" class="ios-modal-close-x" type="button" aria-label="닫기">✕</button>
+            </div>
+            <h2 class="ios-modal-title">주소창 없는 100% 전체화면으로 즐기기</h2>
+            <p class="ios-modal-desc">
+                아이폰 Safari는 <strong>[홈 화면에 추가]</strong>를 하시면 상·하단 툴바가 사라져 진짜 앱처럼 전체화면으로 플레이하실 수 있습니다!
+            </p>
+            <div class="ios-step-list">
+                <div class="ios-step-item">
+                    <div class="ios-step-num">1</div>
+                    <div class="ios-step-content">
+                        사파리 화면 하단(또는 상단)의 <strong>공유 아이콘 (네모+화살표 􀈂)</strong>을 터치합니다.
+                    </div>
+                </div>
+                <div class="ios-step-item">
+                    <div class="ios-step-num">2</div>
+                    <div class="ios-step-content">
+                        메뉴 목록에서 <strong>'홈 화면에 추가'</strong>를 선택합니다.
+                    </div>
+                </div>
+                <div class="ios-step-item">
+                    <div class="ios-step-num">3</div>
+                    <div class="ios-step-content">
+                        우측 상단 <strong>[추가]</strong>를 누른 후, 홈 화면에 생긴 <strong>'Ready Action' 아이콘</strong>으로 접속하세요!
+                    </div>
+                </div>
+            </div>
+            <button id="ios-modal-confirm-btn" class="ios-modal-btn" type="button">확인했습니다</button>
         </div>
     </div>
     
