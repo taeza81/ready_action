@@ -11,20 +11,22 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    height: 100dvh; /* 모바일 주소창 동적 높이 대응 */
     overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation; /* 모바일 더블탭 확대 딜레이 방지 */
 }
 
-/* 16:9 비율 컨테이너 */
+/* 16:9 화면 가득 채우기 (여백 및 테두리 제거) */
 #app-container {
     width: 100vw;
-    height: 56.25vw; /* 16:9 비율 유지 */
-    max-height: 100vh;
-    max-width: 177.78vh; /* 16:9 비율 유지 */
+    height: 100vh;
+    height: 100dvh;
     background-color: #ffffff;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
     position: relative;
     overflow: hidden;
-    border-radius: 20px;
 }
 
 /* 화면 전환 공통 */
@@ -44,11 +46,11 @@ body {
 
 /* 시작 화면 */
 #start-screen {
-    justify-content: space-evenly;
-    align-items: center;
-    padding: 20px 0;
-    background-color: #fff0f5; /* 연한 핑크 */
     position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #fff0f5; /* 연한 핑크 */
+    overflow: hidden;
 }
 
 #main-image {
@@ -61,51 +63,88 @@ body {
     z-index: 1;
 }
 
-.main-title-container {
+/* 상단 1/3 영역 히어로 그룹 (옵션 B) */
+.start-hero-container {
+    position: absolute;
+    top: 11%;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 66px;
+    white-space: nowrap;
+}
+
+/* 상단 2배 확대 타이틀 박스 */
+.main-title-container {
     text-align: center;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 20px 50px;
-    border-radius: 40px;
-    border: 4px solid #ff69b4; /* 경계선 효과 추가 */
-    box-shadow: 0 15px 30px rgba(0,0,0,0.2), inset 0 0 10px rgba(255,105,180,0.2);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 16px 70px;
+    border-radius: 50px;
+    border: 5px solid #ff69b4;
+    box-shadow: 0 14px 35px rgba(0,0,0,0.2), inset 0 0 12px rgba(255,105,180,0.25);
 }
 
 .main-title {
-    font-size: 4rem;
+    font-size: 5rem; /* 기존 2.7rem에서 약 2배로 확대 */
     color: #ff69b4;
-    text-shadow: 2px 2px 0 #fff;
-    margin-bottom: 10px;
+    text-shadow: 3px 3px 0 #fff, 0 0 10px rgba(255,105,180,0.3);
+    margin-bottom: 6px;
+    line-height: 1.05;
 }
 
 .sub-title {
-    font-size: 1.5rem;
+    font-size: 2.1rem; /* 부제목도 시원하게 2배 확대 */
     color: #4682b4;
     font-weight: bold;
+    letter-spacing: 0.5px;
 }
 
+/* 타이틀 바로 아래 게임 시작 버튼 (펄스 모션 적용) */
 #start-btn {
-    z-index: 2;
-    margin-bottom: 20px;
-    font-size: 2rem;
-    padding: 20px 60px;
+    font-size: 2.1rem;
+    padding: 16px 65px;
     background: linear-gradient(135deg, #ff69b4, #ff1493);
-    border: 3px solid #fff;
+    border: 4px solid #fff;
     border-radius: 60px;
-    box-shadow: 0 10px 25px rgba(255,20,147,0.5), inset 0 -5px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 26px rgba(255,20,147,0.55), inset 0 -4px 10px rgba(0,0,0,0.2);
     text-transform: uppercase;
     letter-spacing: 2px;
-    transition: all 0.2s ease;
+    white-space: nowrap;
+    animation: pulseStartBtn 1.8s ease-in-out infinite;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+}
+
+/* 살아 숨쉬듯 통통 튀는 펄스 모션 효과 */
+@keyframes pulseStartBtn {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 10px 26px rgba(255,20,147,0.55), inset 0 -4px 10px rgba(0,0,0,0.2);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 16px 36px rgba(255,20,147,0.8), 0 0 22px rgba(255,105,180,0.7), inset 0 -4px 10px rgba(0,0,0,0.2);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 10px 26px rgba(255,20,147,0.55), inset 0 -4px 10px rgba(0,0,0,0.2);
+    }
 }
 
 #start-btn:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 15px 35px rgba(255,20,147,0.6), inset 0 -5px 15px rgba(0,0,0,0.2);
+    animation-play-state: paused;
+    transform: scale(1.08);
+    box-shadow: 0 18px 40px rgba(255,20,147,0.85), inset 0 -4px 10px rgba(0,0,0,0.2);
 }
 
 #start-btn:active {
-    transform: translateY(5px);
-    box-shadow: 0 0 0 rgba(255,20,147,0.6);
+    transform: scale(0.96);
+    box-shadow: 0 4px 10px rgba(255,20,147,0.6);
 }
 
 /* 게임 화면 */
@@ -145,9 +184,74 @@ body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-/* 카메라 뷰 반전 (거울 모드) */
+/* 카메라 뷰 반전 (거울 모드) 및 부드러운 줌 전환 */
 #camera-feed {
     transform: scaleX(-1);
+    transition: transform 0.15s ease-out;
+}
+
+/* 줌 조절 컨트롤러 */
+.zoom-controls {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 6px 14px;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    touch-action: manipulation;
+}
+
+.zoom-btn {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.zoom-btn:hover {
+    background: rgba(255, 255, 255, 0.45);
+    transform: scale(1.1);
+}
+
+.zoom-btn:active {
+    background: rgba(255, 255, 255, 0.65);
+    transform: scale(0.95);
+}
+
+.zoom-text {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ffffff;
+    min-width: 48px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    padding: 2px 4px;
+    transition: color 0.15s;
+}
+
+.zoom-text:hover {
+    color: #38bdf8;
 }
 
 #snapshot-canvas {
@@ -237,11 +341,11 @@ body {
 /* 전체화면 버튼 */
 .fullscreen-btn {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: max(15px, env(safe-area-inset-top));
+    right: max(15px, env(safe-area-inset-right));
     z-index: 1000;
     padding: 10px 20px;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: white;
     background-color: #4682b4;
@@ -257,23 +361,81 @@ body {
     box-shadow: 0 0 0 #315f86;
 }
 
+/* 세로 모드 회전 안내 화면 (스마트폰/태블릿 공통) */
+#orientation-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    z-index: 99999;
+    color: white;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+}
+
+#orientation-warning .rotate-device-icon {
+    font-size: 4rem;
+    animation: rotatePhone 2s ease-in-out infinite;
+    margin-bottom: 25px;
+}
+
+#orientation-warning p {
+    font-size: 1.35rem;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+#orientation-warning strong {
+    color: #38bdf8;
+    font-size: 1.5rem;
+}
+
+@keyframes rotatePhone {
+    0%, 15% { transform: rotate(0deg); }
+    45%, 65% { transform: rotate(-90deg); }
+    90%, 100% { transform: rotate(0deg); }
+}
+
+/* 기기가 세로 모드일 때만 회전 안내창 표시 */
+@media screen and (orientation: portrait) {
+    #orientation-warning {
+        display: flex;
+    }
+}
+
 /* 반응형 디자인 (스마트폰/태블릿 가로모드 최적화) */
 @media screen and (max-height: 800px) {
+    .start-hero-container {
+        top: 9%;
+        gap: 48px;
+    }
+    .main-title-container {
+        padding: 12px 50px;
+        border-radius: 40px;
+        border-width: 4px;
+    }
     .main-title {
-        font-size: 3rem;
+        font-size: 3.8rem;
     }
     .sub-title {
-        font-size: 1.2rem;
+        font-size: 1.6rem;
     }
     #start-btn {
-        font-size: 1.5rem;
-        padding: 15px 40px;
+        font-size: 1.7rem;
+        padding: 14px 50px;
     }
     .controls {
-        height: 80px;
+        height: 75px;
     }
     .split-layout {
-        height: calc(100% - 80px);
+        height: calc(100% - 75px);
     }
     .action-btn {
         padding: 10px 25px;
@@ -281,33 +443,501 @@ body {
     }
 }
 
-@media screen and (max-height: 500px) {
-    .main-title {
-        font-size: 2.2rem;
-    }
-    .sub-title {
-        font-size: 1rem;
+@media screen and (max-height: 520px) {
+    .start-hero-container {
+        top: 6%;
+        gap: 20px;
     }
     .main-title-container {
-        padding: 10px 30px;
+        padding: 6px 28px;
+        border-radius: 25px;
+        border-width: 3px;
+    }
+    .main-title {
+        font-size: 2.2rem;
+        margin-bottom: 2px;
+    }
+    .sub-title {
+        font-size: 1.05rem;
     }
     #start-btn {
-        font-size: 1.2rem;
-        padding: 10px 30px;
-        border-width: 2px;
+        font-size: 1.25rem;
+        padding: 8px 32px;
+        border-width: 2.5px;
+    }
+    .left-panel, .right-panel {
+        padding: 12px;
+    }
+    #snapshot-canvas {
+        top: 12px;
+        left: 12px;
+        width: calc(100% - 24px);
+        height: calc(100% - 24px);
     }
     .controls {
         height: 60px;
+        gap: 15px;
     }
     .split-layout {
         height: calc(100% - 60px);
     }
     .action-btn {
-        padding: 8px 15px;
+        padding: 8px 18px;
         font-size: 1rem;
+        white-space: nowrap;
     }
     .fullscreen-btn {
-        padding: 6px 12px;
+        padding: 6px 14px;
+        font-size: 0.95rem;
+    }
+    .zoom-controls {
+        bottom: 18px;
+        padding: 4px 10px;
+        gap: 6px;
+    }
+    .zoom-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 0.95rem;
+    }
+    .zoom-text {
+        font-size: 0.95rem;
+        min-width: 40px;
+    }
+}
+
+@media screen and (max-height: 400px) {
+    .start-hero-container {
+        top: 4%;
+        gap: 12px;
+    }
+    .main-title-container {
+        padding: 4px 18px;
+        border-radius: 18px;
+        border-width: 2px;
+    }
+    .main-title {
+        font-size: 1.5rem;
+        margin-bottom: 0px;
+    }
+    .sub-title {
+        font-size: 0.8rem;
+    }
+    #start-btn {
         font-size: 1rem;
+        padding: 6px 24px;
+        border-width: 1.5px;
+    }
+    .left-panel, .right-panel {
+        padding: 8px;
+    }
+    #snapshot-canvas {
+        top: 8px;
+        left: 8px;
+        width: calc(100% - 16px);
+        height: calc(100% - 16px);
+    }
+    .controls {
+        height: 50px;
+        gap: 10px;
+    }
+    .split-layout {
+        height: calc(100% - 50px);
+    }
+    .action-btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+    .fullscreen-btn {
+        padding: 4px 10px;
+        font-size: 0.8rem;
+    }
+    .zoom-controls {
+        bottom: 10px;
+        padding: 3px 8px;
+        gap: 4px;
+    }
+    .zoom-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 0.8rem;
+    }
+    .zoom-text {
+        font-size: 0.85rem;
+        min-width: 36px;
+    }
+}
+
+/* ==========================================================
+   인앱 브라우저(카카오톡 등) 탈출 안내 풀스크린 오버레이
+   화면을 가득 채우는 풀스크린 안내 디자인
+   ========================================================== */
+.inapp-fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: radial-gradient(circle at 50% 20%, #1e1e38 0%, #0f1123 70%, #080914 100%);
+    color: #ffffff;
+    z-index: 9999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(14px, 3vh, 32px) clamp(16px, 4vw, 36px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+}
+
+.inapp-container {
+    width: 100%;
+    max-width: 680px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    border-radius: 28px;
+    padding: clamp(24px, 4.5vh, 40px) clamp(18px, 4vw, 36px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 35px rgba(99, 102, 241, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+}
+
+.inapp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    border-radius: 999px;
+    color: #fca5a5;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.inapp-title {
+    font-size: clamp(1.4rem, 4vw, 2.1rem);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.25;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.5px;
+}
+
+.inapp-subtitle {
+    font-size: clamp(0.9rem, 2.2vw, 1.05rem);
+    color: #cbd5e1;
+    line-height: 1.55;
+}
+
+.inapp-subtitle strong {
+    color: #fde047;
+}
+
+.inapp-recommend-box {
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(129, 140, 248, 0.35);
+    border-radius: 14px;
+    padding: 10px 20px;
+    width: 100%;
+}
+
+.inapp-target-browser {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1rem;
+    color: #e0e7ff;
+}
+
+.inapp-target-browser strong {
+    color: #38bdf8;
+}
+
+.inapp-action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+@media (min-width: 520px) {
+    .inapp-action-group {
+        flex-direction: row;
+    }
+}
+
+.inapp-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 22px;
+    font-size: 1.08rem;
+    font-weight: 700;
+    border-radius: 16px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    user-select: none;
+}
+
+.inapp-btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    animation: inappPulse 2s infinite ease-in-out;
+}
+
+@keyframes inappPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 12px 30px rgba(59, 130, 246, 0.65);
+    }
+}
+
+.inapp-btn-primary:active {
+    transform: scale(0.97);
+}
+
+.inapp-btn-secondary {
+    background: rgba(255, 255, 255, 0.12);
+    color: #f1f5f9;
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+}
+
+.inapp-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.inapp-btn-secondary:active {
+    transform: scale(0.97);
+}
+
+.inapp-url-box {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 8px 12px;
+    gap: 8px;
+}
+
+.url-label {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+#inapp-current-url {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.copy-toast {
+    position: absolute;
+    right: 10px;
+    background: #10b981;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 6px;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.copy-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.inapp-guide-card {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 16px;
+    padding: 14px 18px;
+    text-align: left;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.guide-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.92rem;
+    color: #fbbf24;
+    margin-bottom: 8px;
+}
+
+.guide-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.guide-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #e2e8f0;
+}
+
+.guide-step strong {
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.step-num {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.inapp-dismiss-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 6px 12px;
+    transition: color 0.2s;
+}
+
+.inapp-dismiss-btn:hover {
+    color: #e2e8f0;
+}
+
+@media screen and (max-height: 520px) {
+    .inapp-container {
+        padding: 14px 18px;
+        gap: 10px;
+    }
+    .inapp-badge {
+        padding: 4px 12px;
+        font-size: 0.8rem;
+    }
+    .inapp-title {
+        font-size: 1.25rem;
+        margin-bottom: 0px;
+    }
+    .inapp-subtitle {
+        font-size: 0.82rem;
+        line-height: 1.35;
+    }
+    .inapp-recommend-box {
+        padding: 6px 14px;
+    }
+    .inapp-target-browser {
+        font-size: 0.88rem;
+    }
+    .inapp-btn {
+        padding: 10px 16px;
+        font-size: 0.95rem;
+    }
+    .inapp-guide-card {
+        padding: 8px 12px;
+    }
+    .guide-header {
+        font-size: 0.82rem;
+        margin-bottom: 4px;
+    }
+    .guide-step {
+        font-size: 0.78rem;
+    }
+    .inapp-dismiss-btn {
+        font-size: 0.78rem;
+        padding: 4px;
+    }
+}
+
+/* ==========================================================
+   세로 모드 회전 안내 화면 (모바일/태블릿)
+   ========================================================== */
+#orientation-warning {
+    display: none;
+}
+
+@media screen and (orientation: portrait) and (max-width: 1024px) {
+    #orientation-warning {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        background-color: rgba(15, 23, 42, 0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 999998;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #ffffff;
+        text-align: center;
+        padding: 24px;
+    }
+    .rotate-device-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        animation: rotatePulse 2s infinite ease-in-out;
+    }
+    #orientation-warning p {
+        font-size: 1.3rem;
+        line-height: 1.6;
+        color: #e2e8f0;
+    }
+    #orientation-warning strong {
+        color: #facc15;
+    }
+}
+
+@keyframes rotatePulse {
+    0%, 100% {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(-90deg) scale(1.1);
     }
 }

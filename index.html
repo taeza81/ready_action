@@ -2,23 +2,96 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Ready Action 동작 게임</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- 인앱 브라우저(카카오톡 등) 탈출 안내 풀스크린 화면 -->
+    <div id="inapp-browser-warning" class="inapp-fullscreen-overlay" style="display: none;">
+        <div class="inapp-container">
+            <div class="inapp-badge">🚀 외부 브라우저 전환 안내</div>
+            
+            <h1 class="inapp-title">외부 브라우저에서 실행해주세요</h1>
+            <p class="inapp-subtitle">
+                카카오톡 등 앱 내부 브라우저에서는 <strong>카메라(웹캠) 및 전체화면 기능</strong>이 제한됩니다.<br>
+                아래 버튼을 눌러 원활한 플레이가 가능한 전용 브라우저로 이동해 주세요!
+            </p>
+
+            <!-- 브라우저별 안내 뱃지 / 권장 사항 -->
+            <div class="inapp-recommend-box">
+                <div class="inapp-target-browser" id="inapp-target-browser">
+                    <span class="browser-icon">🌐</span>
+                    <span id="inapp-target-text"><strong>Safari</strong> 또는 <strong>Chrome</strong> 브라우저 권장</span>
+                </div>
+            </div>
+
+            <!-- 주요 액션 버튼 영역 -->
+            <div class="inapp-action-group">
+                <button id="inapp-open-btn" class="inapp-btn inapp-btn-primary">
+                    <span class="btn-icon">🚀</span>
+                    <span id="inapp-open-text">외부 브라우저로 열기</span>
+                </button>
+                <button id="inapp-copy-btn" class="inapp-btn inapp-btn-secondary">
+                    <span class="btn-icon">📋</span>
+                    <span>링크 주소 복사하기</span>
+                </button>
+            </div>
+
+            <!-- 현재 링크 표시 및 복사 피드백 -->
+            <div class="inapp-url-box">
+                <span class="url-label">접속 주소:</span>
+                <input type="text" id="inapp-current-url" readonly value="" />
+                <span id="inapp-copy-toast" class="copy-toast">복사 완료!</span>
+            </div>
+
+            <!-- 수동 탈출 가이드 -->
+            <div class="inapp-guide-card">
+                <div class="guide-header">
+                    <span class="guide-icon">💡</span>
+                    <strong>자동으로 열리지 않을 때는 이렇게 해보세요!</strong>
+                </div>
+                <div class="guide-steps" id="inapp-guide-steps">
+                    <div class="guide-step">
+                        <span class="step-num">1</span>
+                        <span>카카오톡 화면 오른쪽 위나 아래의 <strong>[ ··· ] 더보기</strong> 또는 <strong>[공유]</strong> 버튼 터치</span>
+                    </div>
+                    <div class="guide-step">
+                        <span class="step-num">2</span>
+                        <span>메뉴에서 <strong>'다른 브라우저로 열기'</strong> 또는 <strong>'Safari로 열기'</strong> 선택</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 건너뛰기 버튼 -->
+            <button id="inapp-dismiss-btn" class="inapp-dismiss-btn">
+                현재 창에서 그대로 진행하기
+            </button>
+        </div>
+    </div>
+
+    <!-- 세로 모드 회전 안내 화면 -->
+    <div id="orientation-warning">
+        <div class="rotate-device-icon">📱 🔄</div>
+        <p>원활한 게임 진행을 위해<br>기기를 <strong>가로 모드로 회전</strong>해주세요!</p>
+    </div>
+
     <!-- 전체화면 버튼 -->
     <button id="fullscreen-btn" class="fullscreen-btn">📺 전체화면</button>
 
     <div id="app-container">
         <!-- 시작 화면 -->
         <div id="start-screen" class="screen active">
-            <div class="main-title-container">
-                <h1 class="main-title">Ready Action!</h1>
-                <p class="sub-title">원하는 포즈로 신나게 따라해봐요!</p>
-            </div>
             <img src="새_메인화면.jpg" alt="메인 화면" id="main-image">
-            <button id="start-btn" class="action-btn">게임 시작하기</button>
+            
+            <!-- 상단 하늘 집중형 타이틀 & 시작 버튼 그룹 (옵션 B) -->
+            <div class="start-hero-container">
+                <div class="main-title-container">
+                    <h1 class="main-title">Ready Action!</h1>
+                    <p class="sub-title">원하는 포즈로 신나게 따라해봐요!</p>
+                </div>
+                <button id="start-btn" class="action-btn">게임 시작하기</button>
+            </div>
         </div>
 
         <!-- 게임 화면 -->
@@ -31,8 +104,16 @@
                 
                 <!-- 우측: 카메라 및 캡처 -->
                 <div class="right-panel">
-                    <video id="camera-feed" autoplay playsinline></video>
+                    <video id="camera-feed" autoplay playsinline muted></video>
                     <canvas id="snapshot-canvas"></canvas>
+                    
+                    <!-- 줌 조절 컨트롤러 -->
+                    <div id="zoom-controls" class="zoom-controls">
+                        <button id="zoom-out-btn" class="zoom-btn" type="button" title="축소">➖</button>
+                        <span id="zoom-level-text" class="zoom-text" title="클릭 시 1.0x 리셋">1.0x</span>
+                        <button id="zoom-in-btn" class="zoom-btn" type="button" title="확대">➕</button>
+                    </div>
+
                     <!-- 카운트다운 표시 오버레이 -->
                     <div id="countdown-overlay">
                         <span id="countdown-text"></span>
