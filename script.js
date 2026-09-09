@@ -180,18 +180,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let maxZoom = 3.0;
     let zoomStep = 0.2;
     const poseImages = [
-        '동작/img1.jpg',
-        '동작/img2.jpg',
-        '동작/img3.jpg',
-        '동작/img4.jpg',
-        '동작/img5.jpg',
-        '동작/img6.jpg',
-        '동작/img7.jpg',
-        '동작/img8.jpg',
-        '동작/img9.jpg',
-        '동작/img10.jpg',
-        '동작/img11.jpg',
-        '동작/img12.jpg'
+        '동작/img_1.jpg', '동작/img_2.jpg', '동작/img_3.jpg', '동작/img_4.jpg', '동작/img_5.jpg',
+        '동작/img_6.jpg', '동작/img_7.jpg', '동작/img_8.jpg', '동작/img_9.jpg', '동작/img_10.jpg',
+        '동작/img_11.jpg', '동작/img_12.jpg', '동작/img_13.jpg', '동작/img_14.jpg', '동작/img_15.jpg',
+        '동작/img_16.jpg', '동작/img_17.jpg', '동작/img_18.jpg', '동작/img_19.jpg', '동작/img_20.jpg',
+        '동작/img_21.jpg', '동작/img_22.jpg', '동작/img_23.jpg', '동작/img_24.jpg', '동작/img_25.jpg',
+        '동작/img_26.jpg', '동작/img_27.jpg', '동작/img_28.jpg', '동작/img_29.jpg', '동작/img_30.jpg',
+        '동작/img_31.jpg', '동작/img_32.jpg', '동작/img_33.jpg', '동작/img_34.jpg', '동작/img_35.jpg',
+        '동작/img_36.jpg', '동작/img_37.jpg', '동작/img_38.jpg'
     ];
     let currentPoseIndex = 0;
     
