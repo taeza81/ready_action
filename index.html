@@ -7,9 +7,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Ready Action">
-    <link rel="apple-touch-icon" href="새_메인화면.jpg">
     <title>Ready Action 동작 게임</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Google MediaPipe Pose 라이브러리 (AI 관절 및 랜드마크 추적) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- 인앱 브라우저(카카오톡 등) 탈출 안내 풀스크린 화면 -->
@@ -81,8 +83,11 @@
         <p>원활한 게임 진행을 위해<br>기기를 <strong>가로 모드로 회전</strong>해주세요!</p>
     </div>
 
-    <!-- 전체화면 버튼 -->
-    <button id="fullscreen-btn" class="fullscreen-btn">📺 전체화면</button>
+    <!-- 상단 우측 헤더 유틸리티 버튼 그룹 -->
+    <div class="top-header-actions">
+        <button id="home-btn" class="header-util-btn" style="display: none;">🏠 처음으로</button>
+        <button id="fullscreen-btn" class="header-util-btn">📺 전체화면</button>
+    </div>
 
     <div id="app-container">
         <!-- 시작 화면 -->
@@ -112,6 +117,27 @@
                     <video id="camera-feed" autoplay playsinline muted></video>
                     <canvas id="snapshot-canvas"></canvas>
                     
+                    <!-- AI 스켈레톤 관절 추적 캔버스 (MediaPipe Pose 실시간 랜드마크) -->
+                    <canvas id="skeleton-canvas" class="skeleton-overlay" style="display: none;"></canvas>
+
+                    <!-- 스마트 포즈 실루엣 가이드 오버레이 (인물 최외곽선 전용 투명 가이드) -->
+                    <img id="ghost-overlay" class="ghost-overlay mode-outline" src="동작/outline_1.png" alt="실루엣 가이드" style="display: none;">
+
+                    <!-- AI 실시간 동작 일치율 HUD 위젯 -->
+                    <div id="ai-pose-hud" class="ai-pose-hud" style="display: none;">
+                        <div class="hud-circle-wrap">
+                            <svg class="hud-svg" viewBox="0 0 72 72">
+                                <circle class="hud-bg-circle" cx="36" cy="36" r="30"></circle>
+                                <circle id="hud-bar-circle" class="hud-bar-circle" cx="36" cy="36" r="30"></circle>
+                            </svg>
+                            <span id="hud-score-text">0%</span>
+                        </div>
+                        <div class="hud-info">
+                            <div class="hud-title">🤖 AI 포즈 일치율</div>
+                            <div id="hud-status-badge" class="hud-status-badge">자세를 맞춰보세요!</div>
+                        </div>
+                    </div>
+
                     <!-- 줌 조절 컨트롤러 -->
                     <div id="zoom-controls" class="zoom-controls">
                         <button id="zoom-out-btn" class="zoom-btn" type="button" title="축소">➖</button>
@@ -119,18 +145,133 @@
                         <button id="zoom-in-btn" class="zoom-btn" type="button" title="확대">➕</button>
                     </div>
 
-                    <!-- 카운트다운 표시 오버레이 -->
+                    <!-- 카메라 플래시 효과 오버레이 -->
+                    <div id="camera-flash"></div>
+
+                    <!-- 카운트다운 표시 오버레이 (원형 프로그레스 링) -->
                     <div id="countdown-overlay">
-                        <span id="countdown-text"></span>
+                        <div class="countdown-ring-box">
+                            <svg class="countdown-svg" viewBox="0 0 160 160">
+                                <circle class="countdown-ring-bg" cx="80" cy="80" r="70"></circle>
+                                <circle id="countdown-ring-progress" class="countdown-ring-bar" cx="80" cy="80" r="70"></circle>
+                            </svg>
+                            <span id="countdown-text">5</span>
+                        </div>
+                    </div>
+
+                    <!-- 교사용 접이식 설정 카드 (팝오버) -->
+                    <div id="teacher-settings-popover" class="teacher-settings-card" style="display: none;">
+                        <div class="settings-card-header">
+                            <span class="settings-card-title">⚙️ 교사 카메라 설정</span>
+                            <button id="close-settings-btn" class="settings-close-x" type="button" aria-label="닫기">✕</button>
+                        </div>
+
+                        <!-- 1. 포즈 가이드 토글 -->
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <span class="settings-item-icon">✨</span>
+                                <div>
+                                    <strong class="settings-item-label">포즈 실루엣 가이드</strong>
+                                    <p class="settings-item-desc">카메라 위에 실루엣을 겹쳐 자세 안내</p>
+                                </div>
+                            </div>
+                            <button id="toggle-ghost-btn" class="settings-toggle-switch" type="button">
+                                <span id="ghost-status-text">OFF</span>
+                            </button>
+                        </div>
+
+                        <!-- 실루엣 스타일 & 선명도 서브 컨트롤 -->
+                        <div id="ghost-sub-controls" class="ghost-sub-panel" style="display: none;">
+                            <div class="sub-control-row">
+                                <span class="sub-label">스타일</span>
+                                <div class="guide-mode-chips">
+                                    <button class="guide-mode-chip active" data-mode="outline" type="button" title="외곽선만 네온으로 빛나 학생 모습이 100% 선명">🌟 네온 외곽선</button>
+                                    <button class="guide-mode-chip" data-mode="ghost" type="button" title="배경만 투명화된 반투명 캐릭터">👻 투명 고스트</button>
+                                    <button class="guide-mode-chip" data-mode="silhouette" type="button" title="은은한 단색 실루엣">👤 네온 실루엣</button>
+                                </div>
+                            </div>
+                            <div class="sub-control-row">
+                                <span class="sub-label">선명도</span>
+                                <div class="guide-opacity-chips">
+                                    <button class="guide-opacity-chip" data-opacity="0.4" type="button">은은하게</button>
+                                    <button class="guide-opacity-chip active" data-opacity="0.8" type="button">보통</button>
+                                    <button class="guide-opacity-chip" data-opacity="1.0" type="button">선명하게</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. 거울 모드 토글 -->
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <span class="settings-item-icon">🪞</span>
+                                <div>
+                                    <strong class="settings-item-label">카메라 거울 모드</strong>
+                                    <p class="settings-item-desc">거울처럼 좌우 반전하여 쉽게 따라하기</p>
+                                </div>
+                            </div>
+                            <button id="toggle-mirror-btn" class="settings-toggle-switch active" type="button">
+                                <span id="mirror-status-text">ON</span>
+                            </button>
+                        </div>
+
+                        <!-- 3. 촬영 타이머 선택 -->
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <span class="settings-item-icon">⏱️</span>
+                                <div>
+                                    <strong class="settings-item-label">촬영 타이머</strong>
+                                    <p class="settings-item-desc">수업 상황에 맞게 대기 시간 조절</p>
+                                </div>
+                            </div>
+                            <div class="timer-chips-wrap">
+                                <button class="timer-chip" data-time="0" type="button">즉시</button>
+                                <button class="timer-chip" data-time="3" type="button">3초</button>
+                                <button class="timer-chip active" data-time="5" type="button">5초</button>
+                            </div>
+                        </div>
+
+                        <!-- 4. AI 관절 인식 및 일치율 분석 -->
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <span class="settings-item-icon">🤖</span>
+                                <div>
+                                    <strong class="settings-item-label">AI 관절 인식 (MediaPipe)</strong>
+                                    <p class="settings-item-desc">33개 신체 관절 실시간 추적 & 일치율 분석</p>
+                                </div>
+                            </div>
+                            <button id="toggle-ai-pose-btn" class="settings-toggle-switch" type="button">
+                                <span id="ai-pose-status-text">OFF</span>
+                            </button>
+                        </div>
+
+                        <!-- AI 관절인식 서브 옵션 -->
+                        <div id="ai-pose-sub-controls" class="ghost-sub-panel" style="display: none;">
+                            <div class="sub-control-row">
+                                <span class="sub-label">스켈레톤</span>
+                                <div class="guide-mode-chips">
+                                    <button id="toggle-skeleton-btn" class="guide-mode-chip active" type="button">🦴 스켈레톤 라인 ON</button>
+                                </div>
+                            </div>
+                            <div class="sub-control-row">
+                                <span class="sub-label">자동 촬영</span>
+                                <div class="guide-mode-chips">
+                                    <button class="ai-auto-capture-chip active" data-auto="false" type="button">수동 찰칵</button>
+                                    <button class="ai-auto-capture-chip" data-auto="true" type="button" title="85% 이상 1.2초 유지 시 자동 카운트다운">🎯 85% 시 자동</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 하단 컨트롤(교사용) -->
+            <!-- 하단 컨트롤 바 -->
             <div class="controls">
-                <button id="capture-btn" class="action-btn">📸 사진 촬영 (3초)</button>
+                <!-- 중앙 메인 액션 버튼 -->
+                <button id="capture-btn" class="action-btn">📸 사진 촬영 (5초)</button>
                 <button id="next-btn" class="action-btn" style="display: none;">▶️ 다음 동작</button>
-                <button id="home-btn" class="action-btn secondary">🏠 처음으로</button>
+                
+                <!-- 우측 하단 플로팅 톱니바퀴 설정 버튼 -->
+                <button id="teacher-settings-btn" class="gear-fab-btn" type="button" title="교사 카메라 설정">⚙️</button>
             </div>
         </div>
     </div>
